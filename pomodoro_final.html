@@ -1,0 +1,575 @@
+
+<style>
+:root{--bg:#0f0f13;--s1:#17171f;--s2:#1e1e28;--s3:#25252f;--b1:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);--b3:rgba(255,255,255,0.2);--t1:#f0eeff;--t2:#8b8aa8;--t3:#55546a;--af:#a78bfa;--afd:rgba(167,139,250,0.12);--as:#34d399;--asd:rgba(52,211,153,0.12);--al:#60a5fa;--ald:rgba(96,165,250,0.12);--aw:#f59e0b;}
+*{box-sizing:border-box;margin:0;padding:0;}
+#pom{background:var(--bg);border-radius:20px;padding:24px 22px 28px;font-family:var(--font-sans,system-ui);color:var(--t1);max-width:490px;margin:0 auto;border:1px solid var(--b1);}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.app-name{font-size:13px;font-weight:500;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;}
+.top-actions{display:flex;gap:8px;align-items:center;}
+.audio-toggle{display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--b2);border-radius:100px;padding:5px 11px 5px 8px;cursor:pointer;transition:all .2s;}
+.audio-toggle:hover{border-color:var(--b3);}
+.audio-toggle i{font-size:15px;color:var(--t2);transition:color .2s;}
+.audio-toggle span{font-size:12px;color:var(--t2);transition:color .2s;}
+.audio-toggle.on i,.audio-toggle.on span{color:var(--af);}
+.audio-toggle.on{border-color:rgba(167,139,250,.3);background:var(--afd);}
+.icon-btn{background:none;border:none;color:var(--t3);cursor:pointer;padding:4px;border-radius:6px;line-height:1;transition:color .2s;}
+.icon-btn:hover{color:var(--t1);}
+.icon-btn i{font-size:18px;}
+.mode-pills{display:flex;gap:6px;justify-content:center;margin-bottom:24px;}
+.pill{padding:6px 15px;border-radius:100px;border:1px solid var(--b2);background:none;color:var(--t2);font-size:13px;font-family:inherit;cursor:pointer;transition:all .2s;}
+.pill:hover{color:var(--t1);border-color:var(--b3);}
+.pill.af{background:var(--afd);border-color:rgba(167,139,250,.35);color:var(--af);}
+.pill.as{background:var(--asd);border-color:rgba(52,211,153,.35);color:var(--as);}
+.pill.al{background:var(--ald);border-color:rgba(96,165,250,.35);color:var(--al);}
+.ring-area{display:flex;justify-content:center;margin-bottom:24px;}
+.ring-wrap{position:relative;width:210px;height:210px;}
+.ring-wrap svg{display:block;}
+.time-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.time-digits{font-size:48px;font-weight:500;color:var(--t1);letter-spacing:-2px;font-variant-numeric:tabular-nums;line-height:1;}
+.time-mode{font-size:12px;color:var(--t2);letter-spacing:.05em;}
+.dots-row{display:flex;justify-content:center;gap:8px;margin-bottom:22px;}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--s3);transition:all .4s;}
+.pdot.done{background:var(--af);}
+.pdot.cur{background:var(--af);opacity:.4;}
+.controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px;}
+.ctrl-btn{width:44px;height:44px;border-radius:50%;background:var(--s2);border:1px solid var(--b2);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.ctrl-btn:hover{background:var(--s3);color:var(--t1);border-color:var(--b3);}
+.ctrl-btn:active{transform:scale(.94);}
+.ctrl-btn i{font-size:18px;}
+.play-btn{width:60px;height:60px;border-radius:50%;background:var(--af);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;}
+.play-btn:hover{opacity:.88;}
+.play-btn:active{transform:scale(.94);}
+.play-btn i{font-size:26px;}
+.play-btn.sm{background:var(--as);}
+.play-btn.lm{background:var(--al);}
+
+.stats-daily{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+.stats-daily-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.stats-daily-title{font-size:11px;font-weight:500;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;}
+.streak-badge{display:flex;align-items:center;gap:5px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:100px;padding:3px 10px 3px 7px;}
+.streak-badge i{font-size:13px;color:var(--aw);}
+.streak-badge span{font-size:12px;color:var(--aw);font-weight:500;}
+.daily-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.daily-row:last-child{margin-bottom:0;}
+.daily-label{font-size:13px;color:var(--t2);display:flex;align-items:center;gap:6px;}
+.daily-label i{font-size:14px;color:var(--t3);}
+.daily-val{font-size:13px;font-weight:500;color:var(--t1);}
+.progress-bar-wrap{margin-top:3px;}
+.progress-bar-bg{height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.progress-bar-fg{height:100%;border-radius:2px;transition:width .6s cubic-bezier(.4,0,.2,1);}
+.bar-goal-label{display:flex;justify-content:space-between;margin-top:3px;}
+.bar-goal-label span{font-size:11px;color:var(--t3);}
+
+.heatmap-section{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+.section-title{font-size:11px;font-weight:500;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.heatmap-grid{display:flex;gap:3px;flex-wrap:wrap;}
+.hmap-cell{width:20px;height:20px;border-radius:4px;background:var(--s3);transition:background .3s;cursor:default;position:relative;}
+.hmap-cell:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);border-radius:6px;padding:3px 8px;font-size:11px;color:var(--t1);white-space:nowrap;z-index:10;pointer-events:none;}
+.hmap-lv1{background:rgba(167,139,250,.2);}
+.hmap-lv2{background:rgba(167,139,250,.4);}
+.hmap-lv3{background:rgba(167,139,250,.65);}
+.hmap-lv4{background:#a78bfa;}
+.hmap-days{display:flex;gap:3px;margin-bottom:4px;}
+.hmap-day-lbl{width:20px;text-align:center;font-size:10px;color:var(--t3);}
+.hmap-legend{display:flex;align-items:center;gap:6px;margin-top:8px;justify-content:flex-end;}
+.hmap-legend span{font-size:11px;color:var(--t3);}
+.hmap-legend .hmap-cell{cursor:default;width:14px;height:14px;}
+
+.cfg-panel{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:16px 18px;display:none;margin-bottom:14px;}
+.cfg-panel.open{display:block;}
+.cfg-title{font-size:11px;font-weight:500;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
+.cfg-row{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.cfg-row:last-child{margin-bottom:0;}
+.cfg-row label{font-size:13px;color:var(--t2);flex:1;min-width:0;}
+.cfg-row input[type=range]{flex:1.4;accent-color:var(--af);cursor:pointer;}
+.cfg-val{font-size:13px;color:var(--t1);font-weight:500;min-width:40px;text-align:right;}
+.divider{height:1px;background:var(--b1);margin:12px 0;}
+.vol-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.vol-row i{font-size:15px;color:var(--t3);}
+.vol-row input[type=range]{flex:1;accent-color:var(--af);}
+.vol-row span{font-size:12px;color:var(--t3);min-width:30px;text-align:right;}
+.sound-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sound-card{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;}
+.sound-name{font-size:12px;color:var(--t2);}
+.sound-desc{font-size:11px;color:var(--t3);}
+.preview-btn{background:none;border:1px solid var(--b2);color:var(--t3);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:3px;}
+.preview-btn:hover{color:var(--t1);border-color:var(--b3);}
+.preview-btn i{font-size:12px;}
+.goal-input-row{display:flex;align-items:center;gap:8px;}
+.goal-input-row input[type=number]{width:64px;background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:5px 9px;color:var(--t1);font-size:13px;font-family:inherit;outline:none;}
+.goal-input-row input[type=number]:focus{border-color:var(--af);}
+.goal-input-row span{font-size:13px;color:var(--t2);}
+
+.toast-wrap{display:flex;justify-content:center;margin-top:10px;min-height:22px;}
+.toast-msg{font-size:12px;color:var(--t3);opacity:0;transition:opacity .3s;}
+.toast-msg.show{opacity:1;color:var(--t2);}
+@keyframes pulseR{0%{opacity:1}50%{opacity:.4}100%{opacity:1}}
+.pulse{animation:pulseR .65s ease-out;}
+</style>
+
+<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Temporizador Pomodoro completo con estadísticas diarias</h2>
+
+<div id="pom">
+  <div class="top-bar">
+    <span class="app-name">Pomodoro</span>
+    <div class="top-actions">
+      <button class="audio-toggle on" id="audio-toggle" aria-label="Audio">
+        <i class="ti ti-volume" id="vol-icon" aria-hidden="true"></i>
+        <span id="audio-label">Sonido</span>
+      </button>
+      <button class="icon-btn" id="gear-btn" aria-label="Configuración"><i class="ti ti-settings" aria-hidden="true"></i></button>
+    </div>
+  </div>
+
+  <div class="mode-pills">
+    <button class="pill af" data-mode="focus">Concentración</button>
+    <button class="pill" data-mode="short">Descanso corto</button>
+    <button class="pill" data-mode="long">Descanso largo</button>
+  </div>
+
+  <div class="ring-area">
+    <div class="ring-wrap">
+      <svg width="210" height="210" viewBox="0 0 210 210">
+        <circle cx="105" cy="105" r="92" fill="none" stroke="#ffffff08" stroke-width="6"/>
+        <circle cx="105" cy="105" r="92" fill="none" stroke="#ffffff04" stroke-width="14"/>
+        <circle id="ring-el" cx="105" cy="105" r="92" fill="none" stroke="#a78bfa" stroke-width="6" stroke-linecap="round" transform="rotate(-90 105 105)" style="transition:stroke-dashoffset .85s cubic-bezier(.4,0,.2,1),stroke .35s;"/>
+      </svg>
+      <div class="time-center">
+        <div class="time-digits" id="time-el">25:00</div>
+        <div class="time-mode" id="mode-el">concentración</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dots-row" id="dots-row"></div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="btn-reset" aria-label="Reiniciar"><i class="ti ti-refresh" aria-hidden="true"></i></button>
+    <button class="play-btn" id="btn-play" aria-label="Iniciar"><i class="ti ti-player-play" aria-hidden="true"></i></button>
+    <button class="ctrl-btn" id="btn-skip" aria-label="Saltar"><i class="ti ti-player-skip-forward" aria-hidden="true"></i></button>
+  </div>
+
+  <div class="stats-daily" id="stats-section">
+    <div class="stats-daily-header">
+      <span class="stats-daily-title">Hoy</span>
+      <div class="streak-badge" id="streak-badge">
+        <i class="ti ti-flame" aria-hidden="true"></i>
+        <span id="streak-badge-val">0 días</span>
+      </div>
+    </div>
+    <div class="daily-row">
+      <span class="daily-label"><i class="ti ti-clock" aria-hidden="true"></i>Tiempo de concentración</span>
+      <span class="daily-val" id="d-time">0 min</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fg" id="goal-bar" style="width:0%;background:var(--af);"></div></div>
+      <div class="bar-goal-label"><span id="goal-pct">0% de la meta</span><span id="goal-target">meta: 4 h</span></div>
+    </div>
+    <div class="daily-row" style="margin-top:10px;">
+      <span class="daily-label"><i class="ti ti-layout-grid" aria-hidden="true"></i>Sesiones completadas</span>
+      <span class="daily-val" id="d-sessions">0</span>
+    </div>
+    <div class="daily-row">
+      <span class="daily-label"><i class="ti ti-trophy" aria-hidden="true"></i>Mejor sesión</span>
+      <span class="daily-val" id="d-best">—</span>
+    </div>
+    <div class="daily-row">
+      <span class="daily-label"><i class="ti ti-coffee" aria-hidden="true"></i>Descansos tomados</span>
+      <span class="daily-val" id="d-breaks">0</span>
+    </div>
+  </div>
+
+  <div class="heatmap-section">
+    <div class="section-title">Actividad — últimas 4 semanas</div>
+    <div class="hmap-days" id="hmap-day-labels"></div>
+    <div class="heatmap-grid" id="hmap-grid"></div>
+    <div class="hmap-legend">
+      <span>Menos</span>
+      <div class="hmap-cell"></div>
+      <div class="hmap-cell hmap-lv1"></div>
+      <div class="hmap-cell hmap-lv2"></div>
+      <div class="hmap-cell hmap-lv3"></div>
+      <div class="hmap-cell hmap-lv4"></div>
+      <span>Más</span>
+    </div>
+  </div>
+
+  <div class="cfg-panel" id="cfg-panel">
+    <div class="cfg-title">Temporizador</div>
+    <div class="cfg-row"><label>Concentración</label><input type="range" min="5" max="60" step="5" value="25" id="cfg-focus"><span class="cfg-val" id="v-focus">25 min</span></div>
+    <div class="cfg-row"><label>Descanso corto</label><input type="range" min="1" max="15" step="1" value="5" id="cfg-short"><span class="cfg-val" id="v-short">5 min</span></div>
+    <div class="cfg-row"><label>Descanso largo</label><input type="range" min="5" max="30" step="5" value="15" id="cfg-long"><span class="cfg-val" id="v-long">15 min</span></div>
+    <div class="cfg-row"><label>Sesiones por ciclo</label><input type="range" min="2" max="8" step="1" value="4" id="cfg-cycle"><span class="cfg-val" id="v-cycle">4</span></div>
+    <div class="cfg-row">
+      <label>Meta diaria</label>
+      <div class="goal-input-row">
+        <input type="number" min="1" max="12" value="4" id="cfg-goal">
+        <span>horas</span>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="cfg-title">Audio</div>
+    <div class="vol-row">
+      <i class="ti ti-volume" aria-hidden="true"></i>
+      <input type="range" min="0" max="100" step="1" value="70" id="vol-slider">
+      <span id="vol-val">70%</span>
+    </div>
+    <div class="sound-grid">
+      <div class="sound-card"><div><div class="sound-name">Inicio</div><div class="sound-desc">Al arrancar</div></div><button class="preview-btn" data-sound="start"><i class="ti ti-player-play" aria-hidden="true"></i>probar</button></div>
+      <div class="sound-card"><div><div class="sound-name">Aviso</div><div class="sound-desc">Último minuto</div></div><button class="preview-btn" data-sound="warning"><i class="ti ti-player-play" aria-hidden="true"></i>probar</button></div>
+      <div class="sound-card"><div><div class="sound-name">Completado</div><div class="sound-desc">Fin de sesión</div></div><button class="preview-btn" data-sound="complete"><i class="ti ti-player-play" aria-hidden="true"></i>probar</button></div>
+      <div class="sound-card"><div><div class="sound-name">Ciclo</div><div class="sound-desc">Ciclo completo</div></div><button class="preview-btn" data-sound="cycle"><i class="ti ti-player-play" aria-hidden="true"></i>probar</button></div>
+    </div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="preview-btn" id="reset-stats-btn" style="color:#e24b4a;border-color:rgba(226,75,74,.3);padding:6px 14px;">
+        <i class="ti ti-trash" aria-hidden="true"></i> Resetear estadísticas
+      </button>
+    </div>
+  </div>
+
+  <div class="toast-wrap"><span class="toast-msg" id="toast"></span></div>
+</div>
+
+<script>
+const C = 2 * Math.PI * 92;
+const ringEl = document.getElementById('ring-el');
+const timeEl = document.getElementById('time-el');
+const modeEl = document.getElementById('mode-el');
+const btnPlay = document.getElementById('btn-play');
+const dotsRow = document.getElementById('dots-row');
+const toastEl = document.getElementById('toast');
+
+const MODES = {focus:'concentración',short:'descanso corto',long:'descanso largo'};
+const COLORS = {focus:'#a78bfa',short:'#34d399',long:'#60a5fa'};
+
+let cfg = {focus:25,short:5,long:15,cycle:4,goalHours:4};
+let st = {mode:'focus',running:false,rem:25*60,total:25*60,sessions:0,streak:0,pos:0};
+let iv = null;
+let audioOn = true;
+let volume = 0.7;
+let audioCtx = null;
+let warnFired = false;
+
+const TODAY = new Date().toISOString().slice(0,10);
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem('pom_stats_v2');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e) { return {}; }
+}
+
+function saveData(data) {
+  try { localStorage.setItem('pom_stats_v2', JSON.stringify(data)); } catch(e) {}
+}
+
+function getTodayStats() {
+  const d = loadData();
+  return d[TODAY] || {focusMin:0,sessions:0,breaks:0,bestMin:0};
+}
+
+function recordFocusMin(min) {
+  const d = loadData();
+  if (!d[TODAY]) d[TODAY] = {focusMin:0,sessions:0,breaks:0,bestMin:0};
+  d[TODAY].focusMin = (d[TODAY].focusMin || 0) + min;
+  saveData(d);
+}
+
+function recordSession(min) {
+  const d = loadData();
+  if (!d[TODAY]) d[TODAY] = {focusMin:0,sessions:0,breaks:0,bestMin:0};
+  d[TODAY].sessions = (d[TODAY].sessions || 0) + 1;
+  if (min > (d[TODAY].bestMin || 0)) d[TODAY].bestMin = min;
+  saveData(d);
+}
+
+function recordBreak() {
+  const d = loadData();
+  if (!d[TODAY]) d[TODAY] = {focusMin:0,sessions:0,breaks:0,bestMin:0};
+  d[TODAY].breaks = (d[TODAY].breaks || 0) + 1;
+  saveData(d);
+}
+
+function getStreak() {
+  const d = loadData();
+  let streak = 0;
+  const now = new Date();
+  for (let i = 0; i < 365; i++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const key = date.toISOString().slice(0,10);
+    if (d[key] && d[key].sessions > 0) streak++;
+    else if (i > 0) break;
+  }
+  return streak;
+}
+
+function fmtMin(m) {
+  if (m < 60) return Math.round(m) + ' min';
+  const h = Math.floor(m / 60);
+  const rem = Math.round(m % 60);
+  return rem > 0 ? `${h} h ${rem} min` : `${h} h`;
+}
+
+function updateDailyStats() {
+  const ts = getTodayStats();
+  const goalMin = cfg.goalHours * 60;
+  const pct = Math.min(100, Math.round((ts.focusMin / goalMin) * 100));
+  document.getElementById('d-time').textContent = fmtMin(ts.focusMin);
+  document.getElementById('d-sessions').textContent = ts.sessions;
+  document.getElementById('d-breaks').textContent = ts.breaks;
+  document.getElementById('d-best').textContent = ts.bestMin > 0 ? fmtMin(ts.bestMin) : '—';
+  document.getElementById('goal-bar').style.width = pct + '%';
+  document.getElementById('goal-pct').textContent = pct + '% de la meta';
+  document.getElementById('goal-target').textContent = 'meta: ' + cfg.goalHours + ' h';
+  const streak = getStreak();
+  st.streak = streak;
+  document.getElementById('streak-badge-val').textContent = streak + (streak === 1 ? ' día' : ' días');
+  renderHeatmap();
+}
+
+function renderHeatmap() {
+  const d = loadData();
+  const grid = document.getElementById('hmap-grid');
+  const lbls = document.getElementById('hmap-day-labels');
+  grid.innerHTML = '';
+  lbls.innerHTML = '';
+  const days = 28;
+  const dayNames = ['D','L','M','X','J','V','S'];
+  const now = new Date();
+  const todayDow = now.getDay();
+  for (let i = 0; i < 7; i++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'hmap-day-lbl';
+    lbl.textContent = dayNames[i];
+    lbls.appendChild(lbl);
+  }
+  const cells = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now);
+    date.setDate(date.getDate() - i);
+    const key = date.toISOString().slice(0,10);
+    const stat = d[key];
+    const min = stat ? (stat.focusMin || 0) : 0;
+    cells.push({min, key, date});
+  }
+  cells.forEach(({min, key, date}) => {
+    const cell = document.createElement('div');
+    cell.className = 'hmap-cell';
+    if (min > 120) cell.classList.add('hmap-lv4');
+    else if (min > 60) cell.classList.add('hmap-lv3');
+    else if (min > 25) cell.classList.add('hmap-lv2');
+    else if (min > 0) cell.classList.add('hmap-lv1');
+    const label = date.toLocaleDateString('es-MX',{weekday:'short',month:'short',day:'numeric'});
+    cell.setAttribute('data-tip', min > 0 ? `${label}: ${fmtMin(min)}` : label);
+    grid.appendChild(cell);
+  });
+}
+
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playTone(ctx, freq, type, start, dur, gainVal) {
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+  g.gain.setValueAtTime(0, ctx.currentTime + start);
+  g.gain.linearRampToValueAtTime(gainVal * volume, ctx.currentTime + start + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + dur);
+  osc.connect(g); g.connect(ctx.destination);
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + dur + 0.05);
+}
+
+const sounds = {
+  start() { const c=getCtx(); playTone(c,523.25,'sine',0,.18,.28); playTone(c,659.25,'sine',.18,.18,.28); playTone(c,783.99,'sine',.36,.3,.32); },
+  warning() { const c=getCtx(); [0,.18,.36].forEach(t=>playTone(c,440,'triangle',t,.12,.22)); },
+  complete() { const c=getCtx(); [523.25,659.25,783.99,1046.5].forEach((f,i)=>playTone(c,f,'sine',i*.12,.55,.22)); playTone(c,1046.5,'triangle',.48,.7,.12); },
+  cycle() { const c=getCtx(); [523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>{playTone(c,f,'sine',i*.13,.45,.20);playTone(c,f/2,'sine',i*.13,.45,.08);}); },
+  goal() { const c=getCtx(); [523.25,659.25,783.99,1046.5,1318.5,1568].forEach((f,i)=>{playTone(c,f,'sine',i*.1,.5,.18);playTone(c,f/2,'sine',i*.1,.5,.07);}); }
+};
+
+function play(name) {
+  if (!audioOn) return;
+  try { sounds[name](); } catch(e) {}
+}
+
+document.getElementById('audio-toggle').addEventListener('click', () => {
+  audioOn = !audioOn;
+  document.getElementById('audio-toggle').classList.toggle('on', audioOn);
+  document.getElementById('vol-icon').className = audioOn ? 'ti ti-volume' : 'ti ti-volume-off';
+  document.getElementById('audio-label').textContent = audioOn ? 'Sonido' : 'Silencio';
+});
+
+document.getElementById('vol-slider').addEventListener('input', function() {
+  volume = parseInt(this.value) / 100;
+  document.getElementById('vol-val').textContent = this.value + '%';
+});
+
+document.querySelectorAll('.preview-btn[data-sound]').forEach(btn => {
+  btn.addEventListener('click', () => { const was=audioOn; audioOn=true; play(btn.dataset.sound); audioOn=was; });
+});
+
+document.getElementById('reset-stats-btn').addEventListener('click', () => {
+  if (confirm('¿Resetear todas las estadísticas? Esta acción no se puede deshacer.')) {
+    localStorage.removeItem('pom_stats_v2');
+    updateDailyStats();
+    showToast('Estadísticas reseteadas');
+  }
+});
+
+function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`; }
+function getDur(m) { return cfg[m] * 60; }
+
+function updateRing() {
+  const pct = st.total > 0 ? st.rem / st.total : 1;
+  ringEl.style.strokeDasharray = C;
+  ringEl.style.strokeDashoffset = C * (1 - pct);
+  ringEl.style.stroke = COLORS[st.mode];
+}
+
+function renderDots() {
+  dotsRow.innerHTML = '';
+  for (let i = 0; i < cfg.cycle; i++) {
+    const d2 = document.createElement('div');
+    d2.className = 'pdot' + (i < st.pos ? ' done' : i === st.pos && st.mode === 'focus' ? ' cur' : '');
+    if (i < st.pos) d2.style.background = COLORS.focus;
+    dotsRow.appendChild(d2);
+  }
+}
+
+function updateDisplay() {
+  timeEl.textContent = fmt(st.rem);
+  modeEl.textContent = MODES[st.mode];
+  document.title = `${fmt(st.rem)} · ${MODES[st.mode]}`;
+  updateRing();
+  renderDots();
+  btnPlay.className = 'play-btn' + (st.mode==='short'?' sm':st.mode==='long'?' lm':'');
+  document.querySelectorAll('.pill').forEach(p => {
+    p.className = 'pill';
+    if (p.dataset.mode === st.mode) p.classList.add(st.mode==='focus'?'af':st.mode==='short'?'as':'al');
+  });
+}
+
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 3500);
+}
+
+let sessionFocusMin = 0;
+
+function setMode(m) {
+  stop();
+  st.mode = m;
+  st.total = getDur(m);
+  st.rem = st.total;
+  warnFired = false;
+  sessionFocusMin = 0;
+  updateDisplay();
+}
+
+function tick() {
+  if (st.rem <= 0) { complete(); return; }
+  st.rem--;
+  if (st.mode === 'focus') {
+    sessionFocusMin += 1/60;
+    recordFocusMin(1/60);
+  }
+  if (st.rem === 60 && !warnFired) {
+    warnFired = true;
+    play('warning');
+    ringEl.classList.add('pulse');
+    setTimeout(() => ringEl.classList.remove('pulse'), 700);
+  }
+  updateDisplay();
+  updateDailyStats();
+}
+
+function start() {
+  if (st.running) return;
+  getCtx();
+  st.running = true;
+  iv = setInterval(tick, 1000);
+  play('start');
+  btnPlay.innerHTML = '<i class="ti ti-player-pause" aria-hidden="true"></i>';
+  btnPlay.setAttribute('aria-label','Pausar');
+}
+
+function pause() {
+  st.running = false;
+  clearInterval(iv);
+  btnPlay.innerHTML = '<i class="ti ti-player-play" aria-hidden="true"></i>';
+  btnPlay.setAttribute('aria-label','Reanudar');
+}
+
+function stop() { pause(); }
+
+function complete() {
+  stop();
+  const wasMin = cfg.focus;
+  if (st.mode === 'focus') {
+    recordSession(wasMin);
+    st.sessions++;
+    st.pos++;
+    const ts = getTodayStats();
+    const goalMin = cfg.goalHours * 60;
+    const justHitGoal = ts.focusMin >= goalMin && (ts.focusMin - wasMin) < goalMin;
+    if (st.pos >= cfg.cycle) {
+      st.pos = 0;
+      play('cycle');
+      showToast('Ciclo completo — tómate un descanso largo');
+      setTimeout(() => setMode('long'), 800);
+    } else {
+      if (justHitGoal) { play('goal'); showToast('Meta diaria alcanzada — ¡increíble!'); }
+      else { play('complete'); showToast('Sesión completada — descansa un momento'); }
+      setTimeout(() => setMode('short'), 600);
+    }
+  } else {
+    recordBreak();
+    play('start');
+    showToast('Descanso terminado — ¡a concentrarse!');
+    setTimeout(() => setMode('focus'), 500);
+  }
+  updateDailyStats();
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification('Pomodoro', {body: MODES[st.mode] + ' completado.'});
+  }
+}
+
+btnPlay.addEventListener('click', () => { st.running ? pause() : start(); });
+document.getElementById('btn-reset').addEventListener('click', () => { stop(); st.rem = st.total; warnFired = false; sessionFocusMin = 0; updateDisplay(); });
+document.getElementById('btn-skip').addEventListener('click', () => { stop(); complete(); });
+document.getElementById('gear-btn').addEventListener('click', () => { document.getElementById('cfg-panel').classList.toggle('open'); });
+document.querySelectorAll('.pill').forEach(p => { p.addEventListener('click', () => setMode(p.dataset.mode)); });
+
+function bindCfg(id, key, valId, suffix, resetTimer) {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    cfg[key] = parseInt(el.value);
+    document.getElementById(valId).textContent = el.value + (suffix||'');
+    if (resetTimer && !st.running) { st.total = getDur(st.mode); st.rem = st.total; }
+    renderDots(); updateDisplay(); updateDailyStats();
+  });
+}
+bindCfg('cfg-focus','focus','v-focus',' min',true);
+bindCfg('cfg-short','short','v-short',' min',false);
+bindCfg('cfg-long','long','v-long',' min',false);
+bindCfg('cfg-cycle','cycle','v-cycle','',false);
+
+document.getElementById('cfg-goal').addEventListener('input', function() {
+  cfg.goalHours = Math.max(1, Math.min(12, parseInt(this.value) || 4));
+  updateDailyStats();
+});
+
+if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+
+ringEl.style.strokeDasharray = C;
+updateDisplay();
+updateDailyStats();
+</script>
